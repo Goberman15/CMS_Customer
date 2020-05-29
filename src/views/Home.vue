@@ -1,0 +1,20 @@
+<template>
+  <div class="home">
+    <ProductList/>
+  </div>
+</template>
+
+<script>
+import ProductList from '@/components/ProductList.vue'
+
+export default {
+  name: 'Home',
+  components: {
+    ProductList
+  },
+  created () {
+    this.$store.dispatch('showProducts')
+    this.$store.dispatch('getAllCategory')
+  }
+}
+</script>

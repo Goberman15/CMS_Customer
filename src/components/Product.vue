@@ -63,10 +63,17 @@ export default {
       this.$store.commit('set_cart_product', data)
       this.$store.dispatch('addProductToCart')
         .then(({ data }) => {
-          console.log(data)
+          Swal.fire({
+            icon: 'success',
+            title: `Success add ${data.product.Product.name} to your cart`
+          })
+          this.orderQuantity = 1
         })
         .catch(err => {
-          console.log(err.response)
+          Swal.fire({
+            icon: 'error',
+            title: err.response.data.error
+          })
         })
     }
   },

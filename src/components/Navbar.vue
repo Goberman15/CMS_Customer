@@ -48,6 +48,9 @@ export default {
 
       localStorage.removeItem('access_token')
     }
+  },
+  created () {
+    this.$store.dispatch('showProductOnCart')
   }
 }
 </script>

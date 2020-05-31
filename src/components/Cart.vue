@@ -16,12 +16,22 @@
         <tr v-for="product in $store.state.cart.Products" :key="product.id">
           <td>{{ product.name }}</td>
           <td>
-            <img width="80" :src="product.image_url" :alt="product.name">
+            <img
+              class="product-img"
+              width="80"
+              :src="product.image_url"
+              :alt="product.name"
+              @click="enlargingImage(product)"
+            >
           </td>
           <td>{{ priceFormatter(product.price) }}</td>
           <td>
             <div class="qty">
-              <i class="fas fa-minus-circle" @click="qtyDecrement(product.ProductCart)"></i>
+              <i
+                class="fas fa-minus-circle"
+                @click="qtyDecrement(product.ProductCart)"
+                v-if="product.ProductCart.quantity > 1"
+              ></i>
               <input
                 type="number"
                 class="order-qty"
@@ -30,12 +40,16 @@
                 :value="product.ProductCart.quantity"
                 @input="updateQty($event.target.value, product.id)"
               >
-              <i class="fas fa-plus-circle" @click="qtyIncrement(product.ProductCart)"></i>
+              <i
+                class="fas fa-plus-circle"
+                @click="qtyIncrement(product.ProductCart)"
+                v-if="product.ProductCart.quantity != product.stock"
+              ></i>
             </div>
           </td>
           <td>{{ priceFormatter(product.ProductCart.price) }}</td>
           <td>
-            <i class="fas fa-trash-alt" @click="removeProduct(product.id)"></i>
+            <i class="fas fa-trash-alt" @click="removeProduct(product)"></i>
           </td>
         </tr>
       </tbody>
@@ -58,6 +72,7 @@
 
 <script>
 import accounting from 'accounting-js'
+import Swal from 'sweetalert2'
 
 export default {
   name: 'Cart',
@@ -65,27 +80,62 @@ export default {
     priceFormatter (price) {
       return accounting.formatMoney(price, { symbol: 'Rp ', precision: 2, thousand: '.', decimal: ',' })
     },
-    removeProduct (id) {
-      console.log(id)
-      this.$store.commit('set_deletedId', id)
-      this.$store.dispatch('removeProductFromCart')
-        .then(({ data }) => {
-          console.log(data)
-          this.$store.dispatch('showProductOnCart')
-        })
-        .catch(err => {
-          console.log(err.response)
-        })
+    removeProduct (product) {
+      const deleteWarning = Swal.mixin({
+        customClass: {
+          confirmButton: 'btn btn-success ml-2',
+          cancelButton: 'btn btn-danger mr-2'
+        },
+        buttonsStyling: false
+      })
+
+      deleteWarning.fire({
+        title: `Are you sure want to remove ${product.name}?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'No, take me back!',
+        reverseButtons: true
+      }).then((result) => {
+        if (result.value) {
+          this.$store.commit('set_deletedId', product.id)
+          this.$store.dispatch('removeProductFromCart')
+            .then(({ data }) => {
+              this.$store.dispatch('showProductOnCart')
+              deleteWarning.fire(
+                'Deleted!',
+                `Success remove ${product.name} from your cart`,
+                'success'
+              )
+            })
+            .catch(err => {
+              Swal.fire({
+                icon: 'error',
+                title: err.response.data.error
+              })
+            })
+        } else if (
+          result.dismiss === Swal.DismissReason.cancel
+        ) {
+          deleteWarning.fire(
+            'Cancelled',
+            `${product.name} is safe. It still on your cart`,
+            'error'
+          )
+        }
+      })
     },
     tableUpdate (data) {
       this.$store.commit('set_cart_product', data)
       this.$store.dispatch('changeQuantity')
         .then(({ data }) => {
-          console.log(data)
           this.$store.dispatch('showProductOnCart')
         })
         .catch(err => {
-          console.log(err.response)
+          Swal.fire({
+            icon: 'error',
+            title: err.response.data.error
+          })
         })
     },
     updateQty (value, id) {
@@ -108,6 +158,13 @@ export default {
         quantity: product.quantity - 1
       }
       this.tableUpdate(data)
+    },
+    enlargingImage (product) {
+      Swal.fire({
+        text: `${product.name}`,
+        imageUrl: `${product.image_url}`,
+        imageWidth: 400
+      })
     }
   },
   created () {
@@ -117,7 +174,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .cart-container {
   display: flex;
   flex-direction: column;
@@ -151,6 +208,10 @@ td {
 
 i:hover {
   color: greenyellow;
+  cursor: pointer;
+}
+
+.product-img:hover {
   cursor: pointer;
 }
 </style>

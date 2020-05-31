@@ -20,7 +20,8 @@ export default new Vuex.Store({
     filterCategory: '',
     cartProduct: {},
     deletedId: '',
-    cart: []
+    cart: [],
+    isLoading: false
   },
   mutations: {
     set_login_status (state, payload) {
@@ -61,6 +62,9 @@ export default new Vuex.Store({
     },
     set_cart (state, payload) {
       state.cart = payload
+    },
+    set_loading_status (state, payload) {
+      state.isLoading = payload
     }
   },
   actions: {
@@ -81,9 +85,11 @@ export default new Vuex.Store({
       })
     },
     showProducts ({ commit }) {
+      this.commit('set_loading_status', true)
+      const token = localStorage.access_token
       return server.get(`/products?search=${this.state.searchParams}&sort=name|asc&per_page=100&page=1&categoryId=${this.state.filterCategory}`, {
         headers: {
-          access_token: this.state.access_token
+          access_token: token
         }
       })
         .then(({ data }) => {
@@ -92,11 +98,15 @@ export default new Vuex.Store({
         .catch(err => {
           console.log(err.response)
         })
+        .finally(() => {
+          this.commit('set_loading_status', false)
+        })
     },
     getAllCategory ({ commit }) {
+      const token = localStorage.access_token
       return server.get('/categories?sort=name|asc', {
         headers: {
-          access_token: this.state.access_token
+          access_token: token
         }
       })
         .then(({ data }) => {
@@ -136,7 +146,6 @@ export default new Vuex.Store({
         }
       })
         .then(({ data }) => {
-          console.log(data)
           this.commit('set_cart', data.cart)
         })
         .catch(err => {

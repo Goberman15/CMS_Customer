@@ -1,21 +1,22 @@
 <template>
   <div class="home-container">
     <div class="form-row search-filter">
-      <div class="form-group col-md-4 input-group">
+      <div class="form-group col-4 input-group">
         <input type="text" class="form-control" id="product-search" v-model="productSearch" placeholder="Search Product">
         <div class="input-group-append">
           <span class="input-group-text clear-field"><i class="fas fa-times-circle" @click="clearField"></i></span>
         </div>
       </div>
-      <div class="form-group col-md-4">
+      <div class="form-group col-4">
         <select id="product-category" class="form-control" v-model="productCategory">
           <option value="">Choose Category</option>
           <option v-for="category in $store.state.categories" :key="category.id" :value="category.id">{{ category.name }}</option>
         </select>
       </div>
     </div>
-    <h3 class="text-center" v-if="!$store.state.products.length">No Product Found with selected criteria</h3>
-    <div class="product-container" v-if="$store.state.products.length">
+    <CubeShadow v-if="$store.state.isLoading"></CubeShadow>
+    <h3 class="text-center" v-if="!$store.state.products.length && !$store.state.isLoading">No Product Found with selected criteria</h3>
+    <div class="product-container" v-if="$store.state.products.length && !$store.state.isLoading">
       <div class="product-card" v-for="product in $store.state.products" :key="product.id">
         <div class="img-product">
           <img :src="product.image_url" width="200" alt="">
@@ -32,7 +33,7 @@
           </div>
           <div class="more-info">
             <h5>{{ priceFormatter(product.price) }}</h5>
-            <button class="btn btn-success add-cart" @click="addToCart(product.id)">Add To Cart</button>
+            <button class="btn btn-success add-cart" @click="addToCart(product.id)" v-if="$store.state.isLoggedIn">Add To Cart</button>
           </div>
         </div>
       </div>
@@ -43,9 +44,14 @@
 <script>
 import accounting from 'accounting-js'
 import _ from 'lodash'
+import { CubeShadow } from 'vue-loading-spinner'
+import Swal from 'sweetalert2'
 
 export default {
   name: 'ProductList',
+  components: {
+    CubeShadow
+  },
   data () {
     return {
       productCategory: '',
@@ -70,10 +76,16 @@ export default {
       this.$store.commit('set_cart_product', data)
       this.$store.dispatch('addProductToCart')
         .then(({ data }) => {
-          console.log(data)
+          Swal.fire({
+            icon: 'success',
+            title: `Success add ${data.product.Product.name} to your cart`
+          })
         })
         .catch(err => {
-          console.log(err.response)
+          Swal.fire({
+            icon: 'error',
+            title: err.response.data.error
+          })
         })
     }
   },

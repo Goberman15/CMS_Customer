@@ -9,11 +9,11 @@
                     <div class="login">
                         <div class="group">
                             <label for="loginEmail" class="label">Email</label>
-                            <input id="loginEmail" type="text" class="input" v-model="loginEmail">
+                            <input id="loginEmail" type="text" class="input" v-model="loginEmail" placeholder="Your Email">
                         </div>
                         <div class="group">
                             <label for="loginPassword" class="label">Password</label>
-                            <input id="loginPassword" type="password" class="input" v-model="loginPassword">
+                            <input id="loginPassword" type="password" class="input" v-model="loginPassword" placeholder="Your Password">
                         </div>
                         <div class="group">
                             <input type="submit" class="button" value="Login" @click="login">
@@ -29,19 +29,19 @@
                     <div class="register">
                         <div class="group">
                             <label for="registerName" class="label">Name</label>
-                            <input id="registerName" type="text" class="input" v-model="registerName">
+                            <input id="registerName" type="text" class="input" v-model="registerName" placeholder="Your Name">
                         </div>
                         <div class="group">
                             <label for="registerEmail" class="label">Email</label>
-                            <input id="registerEmail" type="text" class="input" v-model="registerEmail">
+                            <input id="registerEmail" type="text" class="input" v-model="registerEmail" placeholder="Your Email">
                         </div>
                         <div class="group">
                             <label for="registerPhone" class="label">Phone Number</label>
-                            <input id="registerPhone" type="text" class="input" v-model="registerPhone">
+                            <input id="registerPhone" type="text" class="input" v-model="registerPhone" placeholder="Your Phone Number">
                         </div>
                         <div class="group">
                             <label for="registerPassword" class="label">Password</label>
-                            <input id="registerPassword" type="password" class="input" v-model="registerPassword">
+                            <input id="registerPassword" type="password" class="input" v-model="registerPassword" placeholder="Your Password">
                         </div>
                         <div class="group">
                             <input type="submit" class="button" value="Register" @click="register">
@@ -93,10 +93,11 @@ export default {
           this.$store.commit('set_login_status', true)
           const payload = this.$jwt.decode(localStorage.access_token, this.$store.state.secretKey)
           this.$store.commit('set_current_user', payload.name)
+          this.$store.dispatch('addProductToCart')
           this.$router.push({ name: 'Home' })
         })
         .catch(err => {
-          console.log(err.response)
+          this.$toasted.show(err.response.data.error)
         })
     },
     register () {
@@ -118,7 +119,7 @@ export default {
           this.$store.commit('set_registration_status', true)
         })
         .catch(err => {
-          console.log(err.response)
+          this.$toasted.show(err.response.data.error)
         })
     }
   }

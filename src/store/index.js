@@ -7,7 +7,7 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     isLoggedIn: false,
-    loggedInUser: 'Akbar',
+    loggedInUser: '',
     alreadyRegister: false,
     navbarShown: true,
     loginData: {},
@@ -17,7 +17,10 @@ export default new Vuex.Store({
     products: [],
     categories: [],
     searchParams: '',
-    filterCategory: ''
+    filterCategory: '',
+    cartProduct: {},
+    deletedId: '',
+    cart: []
   },
   mutations: {
     set_login_status (state, payload) {
@@ -49,6 +52,15 @@ export default new Vuex.Store({
     },
     set_filter_params (state, payload) {
       state.filterCategory = payload
+    },
+    set_cart_product (state, payload) {
+      state.cartProduct = payload
+    },
+    set_deletedId (state, payload) {
+      state.deletedId = payload
+    },
+    set_cart (state, payload) {
+      state.cart = payload
     }
   },
   actions: {
@@ -103,6 +115,53 @@ export default new Vuex.Store({
           //   text: `${err.response.data.error}`
           // })
         })
+    },
+    addProductToCart ({ commit }) {
+      const token = localStorage.access_token
+      const { productId, quantity } = this.state.cartProduct
+      return server.post('/carts', {
+        productId,
+        quantity
+      }, {
+        headers: {
+          access_token: token
+        }
+      })
+    },
+    showProductOnCart ({ commit }) {
+      const token = localStorage.access_token
+      return server.get('carts', {
+        headers: {
+          access_token: token
+        }
+      })
+        .then(({ data }) => {
+          console.log(data)
+          this.commit('set_cart', data.cart)
+        })
+        .catch(err => {
+          console.log(err.response)
+        })
+    },
+    changeQuantity ({ commit }) {
+      const token = localStorage.access_token
+      const { productId, quantity } = this.state.cartProduct
+      return server.patch(`/carts/${productId}`, {
+        quantity
+      }, {
+        headers: {
+          access_token: token
+        }
+      })
+    },
+    removeProductFromCart ({ commit }) {
+      const token = localStorage.access_token
+      const id = this.state.deletedId
+      return server.delete(`/carts/${id}`, {
+        headers: {
+          access_token: token
+        }
+      })
     }
   }
 })

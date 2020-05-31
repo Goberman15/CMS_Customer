@@ -13,8 +13,6 @@ export default {
     Navbar
   },
   created () {
-    this.$store.dispatch('showProducts')
-    this.$store.dispatch('getAllCategory')
     if (localStorage.access_token) {
       this.$store.commit('set_login_status', true)
       const payload = this.$jwt.decode(localStorage.access_token, this.$store.state.secretKey)

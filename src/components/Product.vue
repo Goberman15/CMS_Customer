@@ -1,8 +1,7 @@
 <template>
   <div class="product-container">
     <div class="product-img">
-        <img :src="product.image_url"
-              width="300" alt="">
+        <img :src="product.image_url" width="300" :alt="product.name" @click="imageEnlarge">
     </div>
     <div class="product-detail ml-5">
       <div class="product-name text-left">
@@ -21,7 +20,7 @@
           <input type="number" class="order-qty" v-model="orderQuantity" min="1" :max="product.stock">
           <i class="fas fa-plus-circle" v-if="orderQuantity != product.stock" @click="qtyIncrement"></i>
         </div>
-        <button class="btn btn-success">Add To Cart</button>
+        <button class="btn btn-success" @click="addToCart">Add To Cart</button>
       </div>
     </div>
   </div>
@@ -29,6 +28,7 @@
 
 <script>
 import accounting from 'accounting-js'
+import Swal from 'sweetalert2'
 
 export default {
   name: 'Product',
@@ -47,6 +47,27 @@ export default {
     },
     qtyDecrement () {
       this.orderQuantity--
+    },
+    imageEnlarge () {
+      Swal.fire({
+        text: `${this.product.name}`,
+        imageUrl: `${this.product.image_url}`,
+        imageWidth: 400
+      })
+    },
+    addToCart () {
+      const data = {
+        productId: this.product.id,
+        quantity: this.orderQuantity
+      }
+      this.$store.commit('set_cart_product', data)
+      this.$store.dispatch('addProductToCart')
+        .then(({ data }) => {
+          console.log(data)
+        })
+        .catch(err => {
+          console.log(err.response)
+        })
     }
   },
   created () {
@@ -81,6 +102,10 @@ export default {
     grid-column: 1/2;
 }
 
+.product-img:hover {
+  cursor: pointer;
+}
+
 .product-name {
   color: rgb(77, 88, 240);
 }
@@ -93,41 +118,41 @@ export default {
 }
 
 .product-detail {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-evenly;
-    align-items: flex-start;
-    min-height: 300px;
-    grid-column: 2/4;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: flex-start;
+  min-height: 300px;
+  grid-column: 2/4;
 }
 
 .action {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .order-qty {
-    border-radius: 5px;
-    width: 40%;
-    margin: 5px;
+  border-radius: 5px;
+  width: 40%;
+  margin: 5px;
 }
 
 .btn {
-    margin-right: 10px;
+  margin-right: 10px;
 }
 
 i {
-    width: 20px;
+  width: 20px;
 }
 
 i:hover {
-    color: chartreuse;
-    cursor: pointer;
+  color: chartreuse;
+  cursor: pointer;
 }
 
 .text-lightblack {
-    color: rgb(46, 44, 44);
+  color: rgb(46, 44, 44);
 }
 </style>

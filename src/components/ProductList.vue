@@ -32,7 +32,7 @@
           </div>
           <div class="more-info">
             <h5>{{ priceFormatter(product.price) }}</h5>
-            <button class="btn btn-success add-cart">Add To Cart</button>
+            <button class="btn btn-success add-cart" @click="addToCart(product.id)">Add To Cart</button>
           </div>
         </div>
       </div>
@@ -61,6 +61,20 @@ export default {
     }, 500),
     clearField () {
       this.productSearch = ''
+    },
+    addToCart (id) {
+      const data = {
+        quantity: 1,
+        productId: id
+      }
+      this.$store.commit('set_cart_product', data)
+      this.$store.dispatch('addProductToCart')
+        .then(({ data }) => {
+          console.log(data)
+        })
+        .catch(err => {
+          console.log(err.response)
+        })
     }
   },
   watch: {
@@ -72,6 +86,10 @@ export default {
       this.$store.commit('set_filter_params', category)
       this.debounceSearch()
     }
+  },
+  created () {
+    this.$store.dispatch('showProducts')
+    this.$store.dispatch('getAllCategory')
   }
 
 }
@@ -87,73 +105,73 @@ export default {
 }
 
 .product-container {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    align-content: flex-start;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  align-content: flex-start;
 }
 
 .product-card {
-    width: 400px;
-    min-height: 300px;
-    margin: 5px;
-    padding: 7px;
-    padding-top: 12px;
-    border: rgb(192, 188, 188) 1px solid;
-    border-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    font-family: 'Balsamiq Sans', cursive;
+  width: 400px;
+  min-height: 300px;
+  margin: 5px;
+  padding: 7px;
+  padding-top: 12px;
+  border: rgb(192, 188, 188) 1px solid;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Balsamiq Sans', cursive;
 }
 
 .product-name {
-    color: rgb(77, 88, 240);
-    width: 100%;
-    font-size: 22px;
-    font-weight: 700;
+  color: rgb(77, 88, 240);
+  width: 100%;
+  font-size: 22px;
+  font-weight: 700;
 }
 
 .product-name:hover {
-    cursor: pointer;
-    color: rgb(46, 55, 175);
+  cursor: pointer;
+  color: rgb(46, 55, 175);
 }
 
 .product-stock {
-    color: crimson;
-    width: 100%;
-    font-size: 18px;
-    font-weight: 400;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  color: crimson;
+  width: 100%;
+  font-size: 18px;
+  font-weight: 400;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .product-info {
-    margin-top: 10px;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
+  margin-top: 10px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
 }
 
 .img-product {
-    transition: all .2s ease-in-out;
-    min-height: 200px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  transition: all .2s ease-in-out;
+  min-height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .img-product:hover {
-    transform: scale(1.1);
+  transform: scale(1.1);
 }
 
 .more-info {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
 }
 
 .badge{

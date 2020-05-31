@@ -9,7 +9,7 @@
           <p class="mr-2">Hi, {{ $store.state.loggedInUser }}</p>
         </li>
         <li class="nav-item whitey cart" v-if="$store.state.isLoggedIn">
-          <router-link to="/">
+          <router-link to="/cart">
             <i class="fas fa-shopping-cart mr-2"></i>
             <span class="badge badge-light mr-4">0</span>
           </router-link>

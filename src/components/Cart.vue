@@ -21,9 +21,16 @@
           <td>{{ priceFormatter(product.price) }}</td>
           <td>
             <div class="qty">
-              <i class="fas fa-minus-circle"></i>
-              <input type="number" class="order-qty" min="1" v-model="product.ProductCart.quantity">
-              <i class="fas fa-plus-circle"></i>
+              <i class="fas fa-minus-circle" @click="qtyDecrement(product.ProductCart)"></i>
+              <input
+                type="number"
+                class="order-qty"
+                min="1"
+                :max="product.stock"
+                :value="product.ProductCart.quantity"
+                @input="updateQty($event.target.value, product.id)"
+              >
+              <i class="fas fa-plus-circle" @click="qtyIncrement(product.ProductCart)"></i>
             </div>
           </td>
           <td>{{ priceFormatter(product.ProductCart.price) }}</td>
@@ -69,6 +76,38 @@ export default {
         .catch(err => {
           console.log(err.response)
         })
+    },
+    tableUpdate (data) {
+      this.$store.commit('set_cart_product', data)
+      this.$store.dispatch('changeQuantity')
+        .then(({ data }) => {
+          console.log(data)
+          this.$store.dispatch('showProductOnCart')
+        })
+        .catch(err => {
+          console.log(err.response)
+        })
+    },
+    updateQty (value, id) {
+      const data = {
+        productId: id,
+        quantity: value
+      }
+      this.tableUpdate(data)
+    },
+    qtyIncrement (product) {
+      const data = {
+        productId: product.ProductId,
+        quantity: product.quantity + 1
+      }
+      this.tableUpdate(data)
+    },
+    qtyDecrement (product) {
+      const data = {
+        productId: product.ProductId,
+        quantity: product.quantity - 1
+      }
+      this.tableUpdate(data)
     }
   },
   created () {
@@ -108,5 +147,10 @@ td {
   cursor: pointer;
   background-color: red;
   color: white;
+}
+
+i:hover {
+  color: greenyellow;
+  cursor: pointer;
 }
 </style>

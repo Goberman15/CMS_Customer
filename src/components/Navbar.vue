@@ -11,7 +11,7 @@
         <li class="nav-item whitey cart" v-if="$store.state.isLoggedIn">
           <router-link to="/cart">
             <i class="fas fa-shopping-cart mr-2"></i>
-            <span class="badge badge-light mr-4">{{ $store.state.cart.Products.length }} items</span>
+            <span class="badge badge-light mr-4">Cart ({{ $store.state.cart.Products.length }} items)</span>
           </router-link>
         </li>
         <li class="nav-item" v-if="!$store.state.isLoggedIn">

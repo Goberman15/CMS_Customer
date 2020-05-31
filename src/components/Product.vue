@@ -60,20 +60,15 @@ export default {
         productId: this.product.id,
         quantity: this.orderQuantity
       }
-      this.$store.commit('set_cart_product', data)
-      this.$store.dispatch('addProductToCart')
+      this.$store.dispatch('addProductToCart', data)
         .then(({ data }) => {
-          Swal.fire({
-            icon: 'success',
-            title: `Success add ${data.product.Product.name} to your cart`
+          this.$toasted.show(`Success add ${data.product.Product.name} to your cart`, {
+            type: 'success'
           })
           this.orderQuantity = 1
         })
         .catch(err => {
-          Swal.fire({
-            icon: 'error',
-            title: err.response.data.error
-          })
+          this.$toasted.show(err.response.data.error)
         })
     }
   },

@@ -13,15 +13,13 @@ export default new Vuex.Store({
     loginData: {},
     registerData: {},
     secretKey: 'pJty7oa0gsAvbpY9c2cMixU88nRl99vTlINfYgERVQkgHQQX9rmi7dj0rcbrLlKa',
-    access_token: localStorage.access_token,
     products: [],
     categories: [],
     searchParams: '',
     filterCategory: '',
-    cartProduct: {},
-    deletedId: '',
     cart: [],
-    isLoading: false
+    isLoading: false,
+    loaderSize: '150px'
   },
   mutations: {
     set_login_status (state, payload) {
@@ -54,12 +52,6 @@ export default new Vuex.Store({
     set_filter_params (state, payload) {
       state.filterCategory = payload
     },
-    set_cart_product (state, payload) {
-      state.cartProduct = payload
-    },
-    set_deletedId (state, payload) {
-      state.deletedId = payload
-    },
     set_cart (state, payload) {
       state.cart = payload
     },
@@ -68,8 +60,8 @@ export default new Vuex.Store({
     }
   },
   actions: {
-    register ({ commit }) {
-      const { name, phoneNumber, email, password } = this.state.registerData
+    register ({ commit }, payload) {
+      const { name, phoneNumber, email, password } = payload
       return server.post('/customers/register', {
         name,
         email,
@@ -77,8 +69,8 @@ export default new Vuex.Store({
         phone_number: phoneNumber
       })
     },
-    login ({ commit }) {
-      const { email, password } = this.state.loginData
+    login ({ commit }, payload) {
+      const { email, password } = payload
       return server.post('/customers/login', {
         email,
         password
@@ -126,9 +118,9 @@ export default new Vuex.Store({
           // })
         })
     },
-    addProductToCart ({ commit }) {
+    addProductToCart ({ commit }, payload) {
       const token = localStorage.access_token
-      const { productId, quantity } = this.state.cartProduct
+      const { productId, quantity } = payload
       return server.post('/carts', {
         productId,
         quantity
@@ -152,9 +144,9 @@ export default new Vuex.Store({
           console.log(err.response)
         })
     },
-    changeQuantity ({ commit }) {
+    changeQuantity ({ commit }, payload) {
       const token = localStorage.access_token
-      const { productId, quantity } = this.state.cartProduct
+      const { productId, quantity } = payload
       return server.patch(`/carts/${productId}`, {
         quantity
       }, {
@@ -163,10 +155,9 @@ export default new Vuex.Store({
         }
       })
     },
-    removeProductFromCart ({ commit }) {
+    removeProductFromCart ({ commit }, payload) {
       const token = localStorage.access_token
-      const id = this.state.deletedId
-      return server.delete(`/carts/${id}`, {
+      return server.delete(`/carts/${payload}`, {
         headers: {
           access_token: token
         }

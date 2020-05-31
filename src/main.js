@@ -7,8 +7,10 @@ import Toasted from 'vue-toasted'
 
 Vue.use(VueJWT)
 Vue.use(Toasted, {
+  theme: 'outline',
   position: 'top-right',
   duration: 5000,
+  type: 'error',
   action: {
     text: 'Close',
     onClick: (e, toastObject) => {

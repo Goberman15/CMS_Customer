@@ -82,19 +82,20 @@ export default {
         password: this.loginPassword
       }
 
-      this.$store.commit('set_login_data', data)
-      this.$store.dispatch('login')
+      this.$store.dispatch('login', data)
         .then(({ data }) => {
           localStorage.setItem('access_token', data.access_token)
+          this.$router.push({ name: 'Home' })
           this.loginEmail = ''
           this.loginPassword = ''
-          this.$store.commit('set_login_data', {})
           this.$store.commit('set_navbar_shown_toggle', true)
           this.$store.commit('set_login_status', true)
           const payload = this.$jwt.decode(localStorage.access_token, this.$store.state.secretKey)
           this.$store.commit('set_current_user', payload.name)
+          this.$toasted.show(`Welcome ${payload.name}! Happy Shopping!`, {
+            type: 'info'
+          })
           this.$store.dispatch('addProductToCart')
-          this.$router.push({ name: 'Home' })
         })
         .catch(err => {
           this.$toasted.show(err.response.data.error)
@@ -108,15 +109,16 @@ export default {
         phoneNumber: this.registerPhone
       }
 
-      this.$store.commit('set_register_data', data)
-      this.$store.dispatch('register')
+      this.$store.dispatch('register', data)
         .then(({ data }) => {
           this.registerName = ''
           this.registerEmail = ''
           this.registerPassword = ''
           this.registerPhone = ''
-          this.$store.commit('set_register_data', {})
           this.$store.commit('set_registration_status', true)
+          this.$toasted.show('Registration Success! Now login to start your season at Gober\'s Sporting Goods', {
+            type: 'info'
+          })
         })
         .catch(err => {
           this.$toasted.show(err.response.data.error)

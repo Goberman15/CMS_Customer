@@ -14,7 +14,7 @@
         </select>
       </div>
     </div>
-    <CubeShadow v-if="$store.state.isLoading"></CubeShadow>
+    <CubeShadow v-if="$store.state.isLoading" :size="$store.state.loaderSize"></CubeShadow>
     <h3 class="text-center" v-if="!$store.state.products.length && !$store.state.isLoading">No Product Found with selected criteria</h3>
     <div class="product-container" v-if="$store.state.products.length && !$store.state.isLoading">
       <div class="product-card" v-for="product in $store.state.products" :key="product.id">
@@ -45,7 +45,6 @@
 import accounting from 'accounting-js'
 import _ from 'lodash'
 import { CubeShadow } from 'vue-loading-spinner'
-import Swal from 'sweetalert2'
 
 export default {
   name: 'ProductList',
@@ -73,19 +72,14 @@ export default {
         quantity: 1,
         productId: id
       }
-      this.$store.commit('set_cart_product', data)
-      this.$store.dispatch('addProductToCart')
+      this.$store.dispatch('addProductToCart', data)
         .then(({ data }) => {
-          Swal.fire({
-            icon: 'success',
-            title: `Success add ${data.product.Product.name} to your cart`
+          this.$toasted.show(`Success add ${data.product.Product.name} to your cart`, {
+            type: 'success'
           })
         })
         .catch(err => {
-          Swal.fire({
-            icon: 'error',
-            title: err.response.data.error
-          })
+          this.$toasted.show(err.response.data.error)
         })
     }
   },

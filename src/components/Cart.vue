@@ -98,8 +98,7 @@ export default {
         reverseButtons: true
       }).then((result) => {
         if (result.value) {
-          this.$store.commit('set_deletedId', product.id)
-          this.$store.dispatch('removeProductFromCart')
+          this.$store.dispatch('removeProductFromCart', product.id)
             .then(({ data }) => {
               this.$store.dispatch('showProductOnCart')
               deleteWarning.fire(
@@ -126,8 +125,7 @@ export default {
       })
     },
     tableUpdate (data) {
-      this.$store.commit('set_cart_product', data)
-      this.$store.dispatch('changeQuantity')
+      this.$store.dispatch('changeQuantity', data)
         .then(({ data }) => {
           this.$store.dispatch('showProductOnCart')
         })

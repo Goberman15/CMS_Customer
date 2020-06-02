@@ -66,6 +66,7 @@ export default {
             type: 'success'
           })
           this.orderQuantity = 1
+          this.$store.dispatch('showProductOnCart')
         })
         .catch(err => {
           this.$toasted.show(err.response.data.error)
@@ -73,6 +74,7 @@ export default {
     }
   },
   created () {
+    this.$store.dispatch('showProducts')
     this.$store.state.products.forEach(product => {
       if (product.id === +this.$route.params.id) {
         this.product = product
@@ -87,6 +89,7 @@ export default {
 .product-container {
     text-align: center;
     width:100%;
+    min-width: 780px;
     border: rgb(206, 202, 202) 1px solid;
     border-radius: 10px;
     display: grid;
@@ -135,14 +138,14 @@ export default {
   align-items: center;
 }
 
+.qty {
+  width: 140px;
+}
+
 .order-qty {
   border-radius: 5px;
   width: 40%;
   margin: 5px;
-}
-
-.btn {
-  margin-right: 10px;
 }
 
 i {

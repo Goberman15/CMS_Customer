@@ -13,7 +13,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="product in $store.state.cart.Products" :key="product.id">
+        <tr v-for="product in cartItem" :key="product.id">
           <td>{{ product.name }}</td>
           <td>
             <img
@@ -54,15 +54,20 @@
         </tr>
       </tbody>
       <tfoot>
-        <tr>
+        <tr v-if="cartItem.length">
           <td colspan="3" class="d-sm-table-cell"></td>
           <td colspan="2" class="d-sm-table-cell text-right">
-            <strong class="pr-3">Total {{ priceFormatter($store.state.cart.total_price) }}</strong>
+            <strong class="pr-3">Total {{ priceFormatter(totalPrice) }}</strong>
           </td>
           <td class="px-0">
-            <button class="btn btn-primary">
+            <button class="btn btn-primary" @click="checkOut">
               Checkout <i class="fa fa-angle-right d-inline"></i>
             </button>
+          </td>
+        </tr>
+        <tr v-if="!cartItem.length">
+          <td class="text-center" colspan="6">
+            <strong class="pr-3">You dont have any product on your cart</strong>
           </td>
         </tr>
       </tfoot>
@@ -163,6 +168,29 @@ export default {
         imageUrl: `${product.image_url}`,
         imageWidth: 400
       })
+    },
+    checkOut () {
+      this.$store.dispatch('checkOutCart')
+        .then(({ data }) => {
+          console.log(data)
+          this.$toasted.show('Checkout Success', {
+            type: 'success'
+          })
+          this.$store.dispatch('showProductOnCart')
+        })
+        .catch(err => {
+          this.$toasted.show(err.response.data.error, {
+            type: 'error'
+          })
+        })
+    }
+  },
+  computed: {
+    cartItem () {
+      return this.$store.state.cartProducts
+    },
+    totalPrice () {
+      return this.$store.state.cartTotalPrice
     }
   },
   created () {

@@ -17,7 +17,8 @@ export default new Vuex.Store({
     categories: [],
     searchParams: '',
     filterCategory: '',
-    cart: [],
+    cartProducts: [],
+    cartTotalPrice: '',
     isLoading: false,
     loaderSize: '150px'
   },
@@ -53,7 +54,10 @@ export default new Vuex.Store({
       state.filterCategory = payload
     },
     set_cart (state, payload) {
-      state.cart = payload
+      state.cartProducts = payload
+    },
+    set_cart_total_price (state, payload) {
+      state.cartTotalPrice = payload
     },
     set_loading_status (state, payload) {
       state.isLoading = payload
@@ -61,6 +65,7 @@ export default new Vuex.Store({
   },
   actions: {
     register ({ commit }, payload) {
+      this.commit('set_loading_status', true)
       const { name, phoneNumber, email, password } = payload
       return server.post('/customers/register', {
         name,
@@ -70,6 +75,7 @@ export default new Vuex.Store({
       })
     },
     login ({ commit }, payload) {
+      this.commit('set_loading_status', true)
       const { email, password } = payload
       return server.post('/customers/login', {
         email,
@@ -79,13 +85,15 @@ export default new Vuex.Store({
     showProducts ({ commit }) {
       this.commit('set_loading_status', true)
       const token = localStorage.access_token
-      return server.get(`/products?search=${this.state.searchParams}&sort=name|asc&per_page=100&page=1&categoryId=${this.state.filterCategory}`, {
+      return server.get(`/products?search=${this.state.searchParams}&sort=name|asc&per_page=100&page=1&categoryId=${this.state.filterCategory}&stock=0`, {
         headers: {
           access_token: token
         }
       })
         .then(({ data }) => {
           this.commit('set_product_list', data.products.data)
+          this.commit('set_search_params', '')
+          this.commit('set_filter_params', '')
         })
         .catch(err => {
           console.log(err.response)
@@ -138,7 +146,9 @@ export default new Vuex.Store({
         }
       })
         .then(({ data }) => {
-          this.commit('set_cart', data.cart)
+          console.log(data)
+          this.commit('set_cart', data.cart.Products)
+          this.commit('set_cart_total_price', data.cart.total_price)
         })
         .catch(err => {
           console.log(err.response)
@@ -162,6 +172,20 @@ export default new Vuex.Store({
           access_token: token
         }
       })
+    },
+    checkOutCart ({ commit }) {
+      const token = localStorage.access_token
+      console.log(token)
+      return server.patch('/carts/checkout', {}, {
+        headers: {
+          access_token: token
+        }
+      })
+    }
+  },
+  getters: {
+    ItemOnCart: state => {
+      return state.cartProducts.length
     }
   }
 })

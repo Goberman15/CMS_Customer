@@ -77,6 +77,7 @@ export default {
           this.$toasted.show(`Success add ${data.product.Product.name} to your cart`, {
             type: 'success'
           })
+          this.$store.dispatch('showProductOnCart')
         })
         .catch(err => {
           this.$toasted.show(err.response.data.error)

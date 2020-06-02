@@ -16,7 +16,10 @@
                             <input id="loginPassword" type="password" class="input" v-model="loginPassword" placeholder="Your Password">
                         </div>
                         <div class="group">
-                            <input type="submit" class="button" value="Login" @click="login">
+                            <input type="submit" class="button" value="Login" @click="login" v-if="!isLoading">
+                        </div>
+                        <div class="loader d-flex justify-content-center mb-3" v-if="isLoading">
+                            <Circle2></Circle2>
                         </div>
                         <div class="foot">
                             <label class="back" @click="backToHomepage"><i class="fas fa-chevron-left"></i> Back to Homepage</label>
@@ -36,20 +39,22 @@
                             <input id="registerEmail" type="text" class="input" v-model="registerEmail" placeholder="Your Email">
                         </div>
                         <div class="group">
-                            <label for="registerPhone" class="label">Phone Number</label>
-                            <input id="registerPhone" type="text" class="input" v-model="registerPhone" placeholder="Your Phone Number">
-                        </div>
-                        <div class="group">
                             <label for="registerPassword" class="label">Password</label>
                             <input id="registerPassword" type="password" class="input" v-model="registerPassword" placeholder="Your Password">
                         </div>
                         <div class="group">
-                            <input type="submit" class="button" value="Register" @click="register">
+                            <input type="submit" class="button" value="Register" @click="register" v-if="!isLoading">
+                        </div>
+                        <div class="loader d-flex justify-content-center mb-3" v-if="isLoading">
+                            <Circle2></Circle2>
                         </div>
                         <div class="foot">
                             <label class="back" @click="backToHomepage"><i class="fas fa-chevron-left"></i> Back to Homepage</label>
                         </div>
                         <div class="hr"></div>
+                        <div class="foot">
+                            <label><i class="far fa-copyright"></i> Photo by Lukas Hartmann from Pexels</label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -58,8 +63,12 @@
 </template>
 
 <script>
+import { Circle2 } from 'vue-loading-spinner'
 export default {
   name: 'FormLoginRegister',
+  components: {
+    Circle2
+  },
   data () {
     return {
       registerName: '',
@@ -95,10 +104,14 @@ export default {
           this.$toasted.show(`Welcome ${payload.name}! Happy Shopping!`, {
             type: 'info'
           })
-          this.$store.dispatch('addProductToCart')
+          this.$store.dispatch('showProducts')
+          this.$store.dispatch('getAllCategory')
         })
         .catch(err => {
           this.$toasted.show(err.response.data.error)
+        })
+        .finally(() => {
+          this.$store.commit('set_loading_status', false)
         })
     },
     register () {
@@ -123,6 +136,14 @@ export default {
         .catch(err => {
           this.$toasted.show(err.response.data.error)
         })
+        .finally(() => {
+          this.$store.commit('set_loading_status', false)
+        })
+    }
+  },
+  computed: {
+    isLoading () {
+      return this.$store.state.isLoading
     }
   }
 }

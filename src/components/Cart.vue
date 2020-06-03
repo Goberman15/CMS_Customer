@@ -1,6 +1,11 @@
 <template>
   <div class="cart-container mt-3">
     <h2 class="mb-3">{{ $store.state.loggedInUser }}'s Shopping Cart</h2>
+    <div class="d-flex aligh-items-center mb-3 top-btn">
+      <router-link to="/transaction">
+        <button class="btn btn-info"><i class="fas fa-clipboard mr-2"></i>See Transaction History</button>
+      </router-link>
+    </div>
     <table class="table cart-table">
       <thead class="thead-dark">
         <tr>
@@ -194,7 +199,11 @@ export default {
     }
   },
   created () {
-    this.$store.dispatch('showProductOnCart')
+    if (!localStorage.access_token) {
+      this.$router.push({ name: 'RegisterLogin' })
+    } else {
+      this.$store.dispatch('showProductOnCart')
+    }
   }
 
 }
@@ -207,6 +216,10 @@ export default {
   justify-content: center;
   align-items: center;
   width: 100%;
+}
+
+.top-btn {
+  width: 85%;
 }
 
 .cart-table {

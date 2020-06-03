@@ -11,10 +11,11 @@
         <h4 class="text-lightblack">{{ priceFormatter(product.price) }}</h4>
       </div>
       <div class="product-stock text-left">
-        <h5>{{ product.stock }} left on stock</h5>
+        <h5 v-if="product.stock > 0">{{ product.stock }} left on stock</h5>
+        <h4 v-if="product.stock === 0"><span class="badge badge-danger">Out of Stock</span></h4>
         <h4><span class="badge badge-info">{{ product.Category.name }}</span></h4>
       </div>
-      <div class="action text-left">
+      <div class="action text-left" v-if="product.stock > 0">
         <div class="qty">
           <i class="fas fa-minus-circle" v-if="orderQuantity > 1" @click="qtyDecrement"></i>
           <input type="number" class="order-qty" v-model="orderQuantity" min="1" :max="product.stock">

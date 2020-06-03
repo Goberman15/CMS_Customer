@@ -4,6 +4,9 @@ import router from './router'
 import store from './store'
 import VueJWT from 'vuejs-jwt'
 import Toasted from 'vue-toasted'
+// import moment from 'moment-timezone'
+
+// moment.tz.setDefault('Jakarta')
 
 Vue.use(VueJWT)
 Vue.use(Toasted, {

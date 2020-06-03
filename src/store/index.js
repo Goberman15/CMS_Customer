@@ -18,6 +18,7 @@ export default new Vuex.Store({
     searchParams: '',
     filterCategory: '',
     cartProducts: [],
+    transactionHistory: [],
     cartTotalPrice: '',
     isLoading: false,
     loaderSize: '150px'
@@ -61,6 +62,9 @@ export default new Vuex.Store({
     },
     set_loading_status (state, payload) {
       state.isLoading = payload
+    },
+    set_transaction_history (state, payload) {
+      state.transactionHistory = payload
     }
   },
   actions: {
@@ -85,7 +89,7 @@ export default new Vuex.Store({
     showProducts ({ commit }) {
       this.commit('set_loading_status', true)
       const token = localStorage.access_token
-      return server.get(`/products?search=${this.state.searchParams}&sort=name|asc&per_page=100&page=1&categoryId=${this.state.filterCategory}&stock=0`, {
+      return server.get(`/products?search=${this.state.searchParams}&sort=name|asc&per_page=100&page=1&categoryId=${this.state.filterCategory}`, {
         headers: {
           access_token: token
         }
@@ -175,12 +179,27 @@ export default new Vuex.Store({
     },
     checkOutCart ({ commit }) {
       const token = localStorage.access_token
-      console.log(token)
       return server.patch('/carts/checkout', {}, {
         headers: {
           access_token: token
         }
       })
+    },
+    showTransactionHistory ({ commit }) {
+      const token = localStorage.access_token
+      return server.get('/carts/history', {
+        headers: {
+          access_token: token
+        }
+      })
+        .then(({ data }) => {
+          this.commit('set_transaction_history', data.products)
+        })
+        .catch(err => {
+          this.$toasted.show(err.response.data.error, {
+            type: 'error'
+          })
+        })
     }
   },
   getters: {

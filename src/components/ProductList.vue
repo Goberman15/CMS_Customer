@@ -28,7 +28,8 @@
             </router-link>
           </div>
           <div class="product-stock">
-            <p>{{ product.stock }} left in stock</p>
+            <p v-if="product.stock > 0">{{ product.stock }} left in stock</p>
+            <h4 v-if="product.stock === 0"><span class="badge badge-danger">Out of Stock</span></h4>
             <h5><span class="badge badge-info">{{ product.Category.name }}</span></h5>
           </div>
           <div class="more-info">

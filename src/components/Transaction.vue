@@ -42,8 +42,8 @@
           </td>
         </tr>
       </tfoot>
-      <CubeShadow v-if="isLoading" :size="loaderSize"></CubeShadow>
     </table>
+    <CubeShadow v-if="isLoading" :size="loaderSize" class="mt-5"></CubeShadow>
   </div>
 </template>
 

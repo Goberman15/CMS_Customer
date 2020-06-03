@@ -16,8 +16,13 @@ export default {
     ProductList, Banner
   },
   created () {
+    this.$store.commit('set_target_page', 1)
     this.$store.dispatch('showProducts')
     this.$store.dispatch('getAllCategory')
+  },
+  beforeDestroy () {
+    this.$store.commit('set_search_params', '')
+    this.$store.commit('set_filter_params', '')
   }
 }
 </script>

@@ -25,7 +25,7 @@ export default new Vuex.Store({
     transactionHistory: [],
     cartTotalPrice: '',
     isLoading: false,
-    loaderSize: '150px'
+    loaderSize: '120px'
   },
   mutations: {
     set_login_status (state, payload) {
@@ -105,7 +105,7 @@ export default new Vuex.Store({
     showProducts ({ commit }) {
       this.commit('set_loading_status', true)
       const token = localStorage.access_token
-      return server.get(`/products?search=${this.state.searchParams}&sort=name|asc&per_page=5&page=${this.state.targetPage}&categoryId=${this.state.filterCategory}`, {
+      return server.get(`/products?search=${this.state.searchParams}&sort=name|asc&per_page=12&page=${this.state.targetPage}&categoryId=${this.state.filterCategory}`, {
         headers: {
           access_token: token
         }
@@ -114,8 +114,6 @@ export default new Vuex.Store({
           this.commit('set_current_page', data.products.current_page)
           this.commit('set_total_page', data.products.last_page)
           this.commit('set_product_list', data.products.data)
-          this.commit('set_search_params', '')
-          this.commit('set_filter_params', '')
         })
         .catch(err => {
           console.log(err.response)

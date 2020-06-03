@@ -14,7 +14,7 @@
         </select>
       </div>
     </div>
-    <CubeShadow v-if="isLoading" :size="loaderSize"></CubeShadow>
+    <CubeShadow v-if="isLoading" :size="loaderSize" class="mb-5"></CubeShadow>
     <h3 class="text-center" v-if="!products.length && !isLoading">No Product Found with selected criteria</h3>
     <div class="product-container mb-5" v-if="products.length && !isLoading">
       <div class="product-card" v-for="product in products" :key="product.id">
@@ -109,10 +109,12 @@ export default {
   },
   watch: {
     productSearch (search) {
+      this.$store.commit('set_target_page', 1)
       this.$store.commit('set_search_params', search)
       this.debounceSearch()
     },
     productCategory (category) {
+      this.$store.commit('set_target_page', 1)
       this.$store.commit('set_filter_params', category)
       this.debounceSearch()
     }

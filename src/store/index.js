@@ -14,6 +14,10 @@ export default new Vuex.Store({
     registerData: {},
     secretKey: 'pJty7oa0gsAvbpY9c2cMixU88nRl99vTlINfYgERVQkgHQQX9rmi7dj0rcbrLlKa',
     products: [],
+    product: {},
+    currentPage: '',
+    targetPage: 1,
+    totalPage: '',
     categories: [],
     searchParams: '',
     filterCategory: '',
@@ -45,6 +49,9 @@ export default new Vuex.Store({
     set_product_list (state, payload) {
       state.products = payload
     },
+    set_selected_product (state, payload) {
+      state.product = payload
+    },
     set_category_list (state, payload) {
       state.categories = payload
     },
@@ -53,6 +60,15 @@ export default new Vuex.Store({
     },
     set_filter_params (state, payload) {
       state.filterCategory = payload
+    },
+    set_current_page (state, payload) {
+      state.currentPage = payload
+    },
+    set_target_page (state, payload) {
+      state.targetPage = payload
+    },
+    set_total_page (state, payload) {
+      state.totalPage = payload
     },
     set_cart (state, payload) {
       state.cartProducts = payload
@@ -89,18 +105,40 @@ export default new Vuex.Store({
     showProducts ({ commit }) {
       this.commit('set_loading_status', true)
       const token = localStorage.access_token
-      return server.get(`/products?search=${this.state.searchParams}&sort=name|asc&per_page=100&page=1&categoryId=${this.state.filterCategory}`, {
+      return server.get(`/products?search=${this.state.searchParams}&sort=name|asc&per_page=5&page=${this.state.targetPage}&categoryId=${this.state.filterCategory}`, {
         headers: {
           access_token: token
         }
       })
         .then(({ data }) => {
+          this.commit('set_current_page', data.products.current_page)
+          this.commit('set_total_page', data.products.last_page)
           this.commit('set_product_list', data.products.data)
           this.commit('set_search_params', '')
           this.commit('set_filter_params', '')
         })
         .catch(err => {
           console.log(err.response)
+        })
+        .finally(() => {
+          this.commit('set_loading_status', false)
+        })
+    },
+    showProductById ({ commit }, payload) {
+      this.commit('set_loading_status', true)
+      const token = localStorage.access_token
+      return server.get(`/products/${payload}`, {
+        headers: {
+          access_token: token
+        }
+      })
+        .then(({ data }) => {
+          this.commit('set_selected_product', data.product)
+        })
+        .catch(err => {
+          this.$toasted.show(err.response.data.error, {
+            type: 'error'
+          })
         })
         .finally(() => {
           this.commit('set_loading_status', false)
@@ -143,6 +181,7 @@ export default new Vuex.Store({
       })
     },
     showProductOnCart ({ commit }) {
+      this.commit('set_loading_status', true)
       const token = localStorage.access_token
       return server.get('carts', {
         headers: {
@@ -150,12 +189,14 @@ export default new Vuex.Store({
         }
       })
         .then(({ data }) => {
-          console.log(data)
           this.commit('set_cart', data.cart.Products)
           this.commit('set_cart_total_price', data.cart.total_price)
         })
         .catch(err => {
           console.log(err.response)
+        })
+        .finally(() => {
+          this.commit('set_loading_status', false)
         })
     },
     changeQuantity ({ commit }, payload) {
@@ -186,6 +227,7 @@ export default new Vuex.Store({
       })
     },
     showTransactionHistory ({ commit }) {
+      this.commit('set_loading_status', true)
       const token = localStorage.access_token
       return server.get('/carts/history', {
         headers: {
@@ -200,11 +242,17 @@ export default new Vuex.Store({
             type: 'error'
           })
         })
+        .finally(() => {
+          this.commit('set_loading_status', false)
+        })
     }
   },
   getters: {
     ItemOnCart: state => {
       return state.cartProducts.length
+    },
+    getProductById: (state) => (id) => {
+      return state.products.find(product => product.id === id)
     }
   }
 })

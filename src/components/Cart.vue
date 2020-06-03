@@ -1,6 +1,6 @@
 <template>
   <div class="cart-container mt-3">
-    <h2 class="mb-3">{{ $store.state.loggedInUser }}'s Shopping Cart</h2>
+    <h2 class="mb-3">{{ currentUser }}'s Shopping Cart</h2>
     <div class="d-flex aligh-items-center mb-3 top-btn">
       <router-link to="/transaction">
         <button class="btn btn-info"><i class="fas fa-clipboard mr-2"></i>See Transaction History</button>
@@ -59,7 +59,7 @@
         </tr>
       </tbody>
       <tfoot>
-        <tr v-if="cartItem.length">
+        <tr v-if="cartItem.length && !isLoading">
           <td colspan="3" class="d-sm-table-cell"></td>
           <td colspan="2" class="d-sm-table-cell text-right">
             <strong class="pr-3">Total {{ priceFormatter(totalPrice) }}</strong>
@@ -70,12 +70,13 @@
             </button>
           </td>
         </tr>
-        <tr v-if="!cartItem.length">
+        <tr v-if="!cartItem.length && !isLoading">
           <td class="text-center" colspan="6">
             <strong class="pr-3">You dont have any product on your cart</strong>
           </td>
         </tr>
       </tfoot>
+      <CubeShadow v-if="isLoading" :size="loaderSize"></CubeShadow>
     </table>
   </div>
 </template>
@@ -83,9 +84,13 @@
 <script>
 import accounting from 'accounting-js'
 import Swal from 'sweetalert2'
+import { CubeShadow } from 'vue-loading-spinner'
 
 export default {
   name: 'Cart',
+  components: {
+    CubeShadow
+  },
   methods: {
     priceFormatter (price) {
       return accounting.formatMoney(price, { symbol: 'Rp ', precision: 2, thousand: '.', decimal: ',' })
@@ -196,14 +201,19 @@ export default {
     },
     totalPrice () {
       return this.$store.state.cartTotalPrice
+    },
+    currentUser () {
+      return this.$store.state.loggedInUser
+    },
+    isLoading () {
+      return this.$store.state.isLoading
+    },
+    loaderSize () {
+      return this.$store.state.loaderSize
     }
   },
   created () {
-    if (!localStorage.access_token) {
-      this.$router.push({ name: 'RegisterLogin' })
-    } else {
-      this.$store.dispatch('showProductOnCart')
-    }
+    this.$store.dispatch('showProductOnCart')
   }
 
 }

@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <Navbar v-if="$store.state.navbarShown"/>
+    <Navbar v-if="navbarShown"/>
     <router-view/>
   </div>
 </template>
@@ -11,6 +11,11 @@ export default {
   name: 'App',
   components: {
     Navbar
+  },
+  computed: {
+    navbarShown () {
+      return this.$store.state.navbarShown
+    }
   },
   created () {
     if (localStorage.access_token) {

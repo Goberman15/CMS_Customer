@@ -10,14 +10,14 @@
       <div class="form-group col-4">
         <select id="product-category" class="form-control" v-model="productCategory">
           <option value="">Choose Category</option>
-          <option v-for="category in $store.state.categories" :key="category.id" :value="category.id">{{ category.name }}</option>
+          <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.name }}</option>
         </select>
       </div>
     </div>
-    <CubeShadow v-if="$store.state.isLoading" :size="$store.state.loaderSize"></CubeShadow>
-    <h3 class="text-center" v-if="!$store.state.products.length && !$store.state.isLoading">No Product Found with selected criteria</h3>
-    <div class="product-container" v-if="$store.state.products.length && !$store.state.isLoading">
-      <div class="product-card" v-for="product in $store.state.products" :key="product.id">
+    <CubeShadow v-if="isLoading" :size="loaderSize"></CubeShadow>
+    <h3 class="text-center" v-if="!products.length && !isLoading">No Product Found with selected criteria</h3>
+    <div class="product-container mb-5" v-if="products.length && !isLoading">
+      <div class="product-card" v-for="product in products" :key="product.id">
         <div class="img-product">
           <img :src="product.image_url" width="200" alt="">
         </div>
@@ -34,11 +34,12 @@
           </div>
           <div class="more-info">
             <h5>{{ priceFormatter(product.price) }}</h5>
-            <button class="btn btn-success add-cart" @click="addToCart(product.id)" v-if="$store.state.isLoggedIn">Add To Cart</button>
+            <button class="btn btn-success add-cart" @click="addToCart(product.id)" v-if="isLoggedIn">Add To Cart</button>
           </div>
         </div>
       </div>
     </div>
+    <Pagination v-if="totalPage > 1"/>
   </div>
 </template>
 
@@ -46,11 +47,12 @@
 import accounting from 'accounting-js'
 import _ from 'lodash'
 import { CubeShadow } from 'vue-loading-spinner'
+import Pagination from '@/components/Pagination.vue'
 
 export default {
   name: 'ProductList',
   components: {
-    CubeShadow
+    CubeShadow, Pagination
   },
   data () {
     return {
@@ -85,6 +87,26 @@ export default {
         })
     }
   },
+  computed: {
+    categories () {
+      return this.$store.state.categories
+    },
+    isLoading () {
+      return this.$store.state.isLoading
+    },
+    loaderSize () {
+      return this.$store.state.loaderSize
+    },
+    isLoggedIn () {
+      return this.$store.state.isLoggedIn
+    },
+    products () {
+      return this.$store.state.products
+    },
+    totalPage () {
+      return this.$store.state.totalPage
+    }
+  },
   watch: {
     productSearch (search) {
       this.$store.commit('set_search_params', search)
@@ -94,12 +116,7 @@ export default {
       this.$store.commit('set_filter_params', category)
       this.debounceSearch()
     }
-  },
-  created () {
-    this.$store.dispatch('showProducts')
-    this.$store.dispatch('getAllCategory')
   }
-
 }
 </script>
 

@@ -11,6 +11,11 @@ export default {
   name: 'ShoppingCart',
   components: {
     Cart
+  },
+  created () {
+    if (!localStorage.access_token) {
+      this.$router.push({ name: 'RegisterLogin' })
+    }
   }
 }
 </script>

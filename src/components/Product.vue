@@ -1,5 +1,7 @@
 <template>
-  <div class="product-container">
+<div class="d-flex flex-column align-items-center mt-3">
+  <CubeShadow v-if="isLoading"></CubeShadow>
+  <div class="product-container" v-if="!isLoading">
     <div class="product-img">
         <img :src="product.image_url" width="300" :alt="product.name" @click="imageEnlarge">
     </div>
@@ -25,18 +27,22 @@
       </div>
     </div>
   </div>
+</div>
 </template>
 
 <script>
 import accounting from 'accounting-js'
 import Swal from 'sweetalert2'
+import { CubeShadow } from 'vue-loading-spinner'
 
 export default {
   name: 'Product',
+  components: {
+    CubeShadow
+  },
   data () {
     return {
-      orderQuantity: 1,
-      product: {}
+      orderQuantity: 1
     }
   },
   methods: {
@@ -74,15 +80,17 @@ export default {
         })
     }
   },
+  computed: {
+    product () {
+      return this.$store.state.product
+    },
+    isLoading () {
+      return this.$store.state.isLoading
+    }
+  },
   created () {
-    this.$store.dispatch('showProducts')
-    this.$store.state.products.forEach(product => {
-      if (product.id === +this.$route.params.id) {
-        this.product = product
-      }
-    })
+    this.$store.dispatch('showProductById', this.$route.params.id)
   }
-
 }
 </script>
 

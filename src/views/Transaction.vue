@@ -10,6 +10,11 @@ export default {
   name: 'Transaction',
   components: {
     TransactionData
+  },
+  created () {
+    if (!localStorage.access_token) {
+      this.$router.push({ name: 'RegisterLogin' })
+    }
   }
 }
 </script>

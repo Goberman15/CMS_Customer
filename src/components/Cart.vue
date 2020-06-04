@@ -19,42 +19,42 @@
       </thead>
       <tbody>
         <tr v-for="product in cartItem" :key="product.id">
-          <td>{{ product.name }}</td>
+          <td>{{ product.Product.name }}</td>
           <td>
             <img
               class="product-img"
               width="80"
-              :src="product.image_url"
-              :alt="product.name"
-              @click="enlargingImage(product)"
+              :src="product.Product.image_url"
+              :alt="product.Product.name"
+              @click="enlargingImage(product.Product)"
             >
           </td>
-          <td>{{ priceFormatter(product.price) }}</td>
+          <td>{{ priceFormatter(product.Product.price) }}</td>
           <td>
             <div class="qty">
               <i
                 class="fas fa-minus-circle"
-                @click="qtyDecrement(product.ProductCart)"
-                v-if="product.ProductCart.quantity > 1"
+                @click="qtyDecrement(product)"
+                v-if="product.quantity > 1"
               ></i>
               <input
                 type="number"
                 class="order-qty"
                 min="1"
-                :max="product.stock"
-                :value="product.ProductCart.quantity"
-                @input="updateQty($event.target.value, product.id)"
+                :max="product.Product.stock"
+                :value="product.quantity"
+                @input="updateQty($event.target.value, product.Product.id)"
               >
               <i
                 class="fas fa-plus-circle"
-                @click="qtyIncrement(product.ProductCart)"
-                v-if="product.ProductCart.quantity != product.stock"
+                @click="qtyIncrement(product)"
+                v-if="product.quantity != product.Product.stock"
               ></i>
             </div>
           </td>
-          <td>{{ priceFormatter(product.ProductCart.price) }}</td>
+          <td>{{ priceFormatter(product.price) }}</td>
           <td>
-            <i class="fas fa-trash-alt" @click="removeProduct(product)"></i>
+            <i class="fas fa-trash-alt" @click="removeProduct(product.Product)"></i>
           </td>
         </tr>
       </tbody>
@@ -182,7 +182,6 @@ export default {
     checkOut () {
       this.$store.dispatch('checkOutCart')
         .then(({ data }) => {
-          console.log(data)
           this.$toasted.show('Checkout Success', {
             type: 'success'
           })
@@ -192,6 +191,9 @@ export default {
           this.$toasted.show(err.response.data.error, {
             type: 'error'
           })
+        })
+        .finally(() => {
+          this.$store.commit('set_loading_status', false)
         })
     }
   },
@@ -213,6 +215,7 @@ export default {
     }
   },
   created () {
+    this.$store.commit('set_loading_status', true)
     this.$store.dispatch('showProductOnCart')
   }
 

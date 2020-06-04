@@ -44,7 +44,7 @@ export default {
         autoplay: true
       },
       vfImages: [one, two, three],
-      vfTransitions: ['kenburn', 'waterfall', 'blocks2', 'cube', 'book', 'wave', 'round2'],
+      vfTransitions: ['kenburn', 'waterfall', 'blocks2', 'cube', 'book', 'round1', 'round2'],
       vfCaptions: [
         'Football Weekend Discount Special',
         'GOBER\'S PRESENT: 2021 RUN-ATHON',

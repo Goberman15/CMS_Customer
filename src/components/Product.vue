@@ -85,7 +85,7 @@ export default {
       return this.$store.state.product
     },
     isLoading () {
-      return this.$store.state.isLoading
+      return this.$store.state.isLoadingProduct
     }
   },
   created () {

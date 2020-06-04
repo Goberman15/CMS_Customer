@@ -92,7 +92,7 @@ export default {
       return this.$store.state.categories
     },
     isLoading () {
-      return this.$store.state.isLoading
+      return this.$store.state.isLoadingProduct
     },
     loaderSize () {
       return this.$store.state.loaderSize

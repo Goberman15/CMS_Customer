@@ -3,8 +3,26 @@
         <div class="form-wrap">
             <div class="form-body">
                 <h2 class="text-center">Welcome to Gober's Sporting Goods</h2> <br>
-                <input id="tab-1" type="radio" name="tab" class="login-tab" value="true" v-model="alreadyRegister"><label for="tab-1" class="tab">Login</label>
-                <input id="tab-2" type="radio" name="tab" class="register-tab" value="false" v-model="alreadyRegister"><label for="tab-2" class="tab">Register</label>
+                <input
+                  id="tab-1"
+                  type="radio"
+                  name="tab"
+                  class="login-tab"
+                  value="true"
+                  v-model="alreadyRegister">
+                <label
+                  for="tab-1"
+                  class="tab">Login</label>
+                <input
+                  id="tab-2"
+                  type="radio"
+                  name="tab"
+                  class="register-tab"
+                  value="false"
+                  v-model="alreadyRegister">
+                <label
+                  for="tab-2"
+                  class="tab">Register</label>
                 <div class="form">
                     <div class="login">
                         <div class="group">
@@ -145,8 +163,26 @@ export default {
     isLoading () {
       return this.$store.state.isLoading
     },
-    alreadyRegister () {
-      return this.$store.state.alreadyRegister
+    alreadyRegister: {
+      get: function () {
+        return this.$store.state.alreadyRegister
+      },
+      set: function (newVal) {
+        this.$store.commit('set_registration_status', newVal)
+      }
+    }
+  },
+  watch: {
+    alreadyRegister (val) {
+      if (val) {
+        this.registerName = ''
+        this.registerEmail = ''
+        this.registerPassword = ''
+        this.registerPhone = ''
+      } else if (!val) {
+        this.loginEmail = ''
+        this.loginPassword = ''
+      }
     }
   }
 }
